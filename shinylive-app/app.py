@@ -27,7 +27,7 @@ def server(input: Inputs, output: Outputs, session: Session):
             "status": "error",
             "message": (
                 "Live mode is not available in the browser. "
-                "Install locally with: pip install dspy-explorer[live]"
+                "Run locally with: uvx dspy-explorer"
             ),
         })
 

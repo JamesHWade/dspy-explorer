@@ -15,11 +15,6 @@ export function detectPhase(
     return "identify_gap";
   }
 
-  // Sub-LM queries = cross-reference
-  if (/llm_query/.test(code)) {
-    return "cross_reference";
-  }
-
   // Orient: early iterations scanning overall structure
   if (
     idx <= 2 &&

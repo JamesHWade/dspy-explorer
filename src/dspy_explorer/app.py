@@ -37,7 +37,7 @@ def server(input: Inputs, output: Outputs, session: Session):
         except ImportError:
             await post_message(session, "live_status", {
                 "status": "error",
-                "message": "Live mode requires DSPy. Install with: uv pip install 'dspy-explorer[live]'",
+                "message": "Live mode requires DSPy. Install with: uv pip install 'dspy[pyodide]'",
             })
 
 
