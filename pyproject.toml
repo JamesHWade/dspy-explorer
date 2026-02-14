@@ -1,0 +1,19 @@
+[project]
+name = "dspy-explorer"
+version = "0.1.0"
+description = "Interactive DSPy RLM trace explorer"
+requires-python = ">=3.10"
+dependencies = [
+    "shiny>=1.0",
+    "click>=8.0",
+]
+
+[project.optional-dependencies]
+live = ["dspy>=2.6"]
+
+[project.scripts]
+dspy-explorer = "dspy_explorer.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

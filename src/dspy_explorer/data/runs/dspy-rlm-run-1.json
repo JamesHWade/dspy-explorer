@@ -1,0 +1,90 @@
+{
+  "run_id": "dspy-rlm-run-1",
+  "timestamp": "2026-02-14T10:00:00Z",
+  "question": "What are the most commonly used decorators in the Flask web framework and how do they work internally?",
+  "model": "gpt-4o-mini",
+  "context_variables": [
+    {
+      "name": "flask_source",
+      "size_chars": 1850000,
+      "n_files": 42
+    },
+    {
+      "name": "werkzeug_source",
+      "size_chars": 920000,
+      "n_files": 38
+    }
+  ],
+  "iterations": [
+    {
+      "iteration": 1,
+      "reasoning": "I need to understand Flask's decorator system. Let me start by searching the Flask source for decorator definitions and the @app.route pattern.",
+      "code": "results = exec_source('flask_source', 'grep', pattern=r'def\\s+route|def\\s+decorator|@app\\.route')\nprint(results[:2000])",
+      "output": "Found 18 matches:\n  flask/app.py:1024:    def route(self, rule: str, **options: t.Any) -> t.Callable:\n  flask/app.py:1056:        def decorator(f: T_route) -> T_route:\n  flask/scaffold.py:78:    def route(self, rule: str, **options: t.Any) -> t.Callable:\n  flask/scaffold.py:110:        def decorator(f: T_route) -> T_route:\n  flask/blueprints.py:92:    def route(self, rule: str, **options: t.Any) -> t.Callable:\n  flask/app.py:1142:    def before_request(self, f: T_before_request) -> T_before_request:\n  flask/app.py:1168:    def after_request(self, f: T_after_request) -> T_after_request:\n  flask/app.py:1198:    def errorhandler(self, code_or_exception: type[Exception] | int):",
+      "success": true,
+      "is_final": false,
+      "phase": "orient"
+    },
+    {
+      "iteration": 2,
+      "reasoning": "Good - flask/scaffold.py and flask/app.py contain the core decorator implementations. Let me read the route() method to understand how URL routing works internally.",
+      "code": "source = inspect_source('flask_source', 'flask/scaffold.py', start=78, end=140)\nprint(source)",
+      "output": "    def route(self, rule: str, **options: t.Any) -> t.Callable:\n        \"\"\"Decorate a view function to register it with the given URL\n        rule and options. Calls :meth:`add_url_rule`, which has more\n        details about the implementation.\n\n        .. code-block:: python\n\n            @app.route(\"/\")\n            def index():\n                return \"Hello, World!\"\n\n        See :ref:`url-route-registrations`.\n        \"\"\"\n        def decorator(f: T_route) -> T_route:\n            endpoint = options.pop(\"endpoint\", None)\n            self.add_url_rule(rule, endpoint, f, **options)\n            return f\n        return decorator\n\n    def add_url_rule(\n        self,\n        rule: str,\n        endpoint: str | None = None,\n        view_func: ft.RouteCallable | None = None,\n        provide_automatic_options: bool | None = None,\n        **options: t.Any,\n    ) -> None:",
+      "success": true,
+      "is_final": false,
+      "phase": "locate"
+    },
+    {
+      "iteration": 3,
+      "reasoning": "Now I understand route(). It's a decorator factory - it returns a decorator that calls add_url_rule(). Let me look at the before_request and after_request decorators to understand the request lifecycle hooks.",
+      "code": "source = inspect_source('flask_source', 'flask/app.py', start=1142, end=1220)\nprint(source)",
+      "output": "    def before_request(self, f: T_before_request) -> T_before_request:\n        \"\"\"Register a function to run before each request.\n\n        For example, this can be used to open a database connection, or\n        to load the logged in user from the session.\n\n        .. code-block:: python\n\n            @app.before_request\n            def load_user():\n                if \"user_id\" in session:\n                    g.user = db.session.get(User, session[\"user_id\"])\n        \"\"\"\n        self.before_request_funcs.setdefault(None, []).append(f)\n        return f\n\n    def after_request(self, f: T_after_request) -> T_after_request:\n        \"\"\"Register a function to run after each request to this\n        object. The function is called with and must return the\n        response object.\n        \"\"\"\n        self.after_request_funcs.setdefault(None, []).append(f)\n        return f\n\n    def teardown_request(self, f: T_teardown) -> T_teardown:\n        \"\"\"Register a function to run at the end of each request,\n        regardless of whether there was an exception or not.\n        \"\"\"\n        self.teardown_request_funcs.setdefault(None, []).append(f)\n        return f",
+      "success": true,
+      "is_final": false,
+      "phase": "locate"
+    },
+    {
+      "iteration": 4,
+      "reasoning": "The lifecycle decorators are simpler - they just append the function to a list. Let me check how errorhandler() works since it has a different pattern (takes an argument).",
+      "code": "source = inspect_source('flask_source', 'flask/app.py', start=1198, end=1250)\nprint(source)",
+      "output": "    def errorhandler(\n        self, code_or_exception: type[Exception] | int\n    ) -> t.Callable[[T_error_handler], T_error_handler]:\n        \"\"\"Register a function to handle errors by code or exception\n        class.\n\n        A decorator that is used to register a function given an\n        error code. Example::\n\n            @app.errorhandler(404)\n            def page_not_found(error):\n                return 'This page does not exist', 404\n\n        You can also register handlers for arbitrary exceptions::\n\n            @app.errorhandler(DatabaseError)\n            def special_exception_handler(error):\n                return 'Database connection failed', 500\n        \"\"\"\n        def decorator(f: T_error_handler) -> T_error_handler:\n            self.register_error_handler(code_or_exception, f)\n            return f\n        return decorator",
+      "success": true,
+      "is_final": false,
+      "phase": "trace_code"
+    },
+    {
+      "iteration": 5,
+      "reasoning": "I see two patterns: (1) simple decorators like before_request that take the function directly, and (2) decorator factories like route() and errorhandler() that take arguments and return a decorator. Let me verify by looking at how Werkzeug's URL map ties into this.",
+      "code": "results = exec_source('werkzeug_source', 'grep', pattern=r'class Rule|class Map|def add')\nprint(results[:1500])",
+      "output": "Found 8 matches:\n  werkzeug/routing/map.py:45:class Map:\n  werkzeug/routing/map.py:198:    def add(self, rulefactory: RuleFactory) -> None:\n  werkzeug/routing/rules.py:88:class Rule(RuleFactory):\n  werkzeug/routing/rules.py:196:    def __init__(\n  werkzeug/routing/rules.py:290:    def bind(self, map: Map, rebind: bool = False) -> None:\n  werkzeug/routing/rules.py:340:    def match(self, path: str, method: str | None = None) -> tuple[str, dict]:",
+      "success": true,
+      "is_final": false,
+      "phase": "cross_reference"
+    },
+    {
+      "iteration": 6,
+      "reasoning": "Now I can see the full picture: Flask's route() decorator creates Werkzeug Rule objects and adds them to a URL Map. Let me use llm_query to synthesize my findings into a clear answer.",
+      "code": "summary = llm_query(\n    \"Summarize the three decorator patterns found in Flask: \"\n    \"(1) route() as a decorator factory calling add_url_rule, \"\n    \"(2) before_request/after_request as simple decorators appending to lists, \"\n    \"(3) errorhandler() as a parameterized decorator factory. \"\n    \"Explain how they connect to Werkzeug's URL routing.\",\n    context=None\n)\nprint(summary)",
+      "output": "Flask uses three distinct decorator patterns:\n\n1. **@app.route(rule)** - A decorator factory. Calling route('/path') returns a decorator that registers the view function via add_url_rule(), which creates a Werkzeug Rule and adds it to the URL Map.\n\n2. **@app.before_request / @app.after_request** - Simple decorators that append the function to internal lists (before_request_funcs, after_request_funcs). These are called in order during request processing.\n\n3. **@app.errorhandler(code)** - A parameterized decorator factory similar to route(). Takes an error code or exception class and returns a decorator that registers the handler.\n\nAll patterns share a key design: they return the original function unchanged, allowing stacking of multiple decorators. The URL routing connects to Werkzeug's Map/Rule system for actual request dispatch.",
+      "success": true,
+      "is_final": false,
+      "phase": "trace_code"
+    },
+    {
+      "iteration": 7,
+      "reasoning": "I now have a comprehensive understanding of Flask's decorator system. Let me submit the final answer.",
+      "code": "SUBMIT(answer=\"Flask uses three main decorator patterns:\\n\\n1. **@app.route(rule, **options)** - The most commonly used decorator. It's a decorator factory: calling route('/path') returns a decorator that registers the view function by calling add_url_rule(). Internally, this creates a Werkzeug Rule object and adds it to the application's URL Map for request routing.\\n\\n2. **@app.before_request / @app.after_request / @app.teardown_request** - Simple decorators (not factories) that append the decorated function to internal lists. before_request functions run before each request handler, after_request functions process the response, and teardown_request runs cleanup regardless of errors.\\n\\n3. **@app.errorhandler(code_or_exception)** - A parameterized decorator factory like route(). Takes an HTTP status code (e.g., 404) or exception class and returns a decorator that registers the function as an error handler via register_error_handler().\\n\\nKey design principle: All Flask decorators return the original function unchanged, enabling decorator stacking. The route system delegates to Werkzeug's Rule/Map classes for URL matching and dispatch.\")",
+      "output": "Answer submitted successfully.",
+      "success": true,
+      "is_final": true,
+      "phase": "identify_gap"
+    }
+  ],
+  "final_answer": "Flask uses three main decorator patterns:\n\n1. **@app.route(rule, **options)** - The most commonly used decorator. It's a decorator factory: calling route('/path') returns a decorator that registers the view function by calling add_url_rule(). Internally, this creates a Werkzeug Rule object and adds it to the application's URL Map for request routing.\n\n2. **@app.before_request / @app.after_request / @app.teardown_request** - Simple decorators (not factories) that append the decorated function to internal lists. before_request functions run before each request handler, after_request functions process the response, and teardown_request runs cleanup regardless of errors.\n\n3. **@app.errorhandler(code_or_exception)** - A parameterized decorator factory like route(). Takes an HTTP status code (e.g., 404) or exception class and returns a decorator that registers the function as an error handler via register_error_handler().\n\nKey design principle: All Flask decorators return the original function unchanged, enabling decorator stacking. The route system delegates to Werkzeug's Rule/Map classes for URL matching and dispatch.",
+  "iterations_used": 7,
+  "llm_calls_used": 8,
+  "total_tokens": {
+    "input": 18500,
+    "output": 4200
+  }
+}
