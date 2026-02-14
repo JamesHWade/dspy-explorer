@@ -54,6 +54,27 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
           </p>
         </div>
 
+        {/* Addressing the obvious question */}
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">
+            &ldquo;Isn&rsquo;t this just giving an agent tools?&rdquo;
+          </p>
+          <p>
+            Sort of. The difference is constraint. An agent picks from a menu of
+            tools &mdash; web search, file read, API call &mdash; and the orchestration
+            logic is where things get fragile. An RLM has exactly one tool: a Python
+            interpreter. The model decides what to do by writing code, not by
+            choosing from a fixed set of actions. There&rsquo;s no routing layer,
+            no tool descriptions to prompt-engineer, no retry heuristics. The
+            sandbox is deterministic: same code in, same output out.
+          </p>
+          <p>
+            The tradeoff is obvious &mdash; you give up the breadth of arbitrary tools
+            for a tighter loop that&rsquo;s easier to reason about and optimize with
+            DSPy&rsquo;s compiler.
+          </p>
+        </div>
+
         {/* CTA */}
         <div className="text-center space-y-3">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
