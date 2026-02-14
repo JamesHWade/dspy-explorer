@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import time
 from typing import Any
 
@@ -13,6 +14,9 @@ from dspy_explorer.shinyreact import post_message
 async def run_live_rlm(session: Session, config: dict[str, Any]) -> None:
     """Run a DSPy RLM query and stream results back to the client."""
     await post_message(session, "live_status", {"status": "running"})
+
+    # Prevent Deno from using project's package.json for npm resolution
+    os.environ.setdefault("DENO_NO_PACKAGE_JSON", "1")
 
     try:
         import dspy

@@ -5,7 +5,7 @@ interface CodeBlockProps {
   className?: string;
 }
 
-const RLM_TOOLS = ["SUBMIT", "inspect_source", "exec_source", "llm_query", "llm_query_batched"];
+const RLM_TOOLS = ["SUBMIT", "llm_query", "llm_query_batched", "print"];
 
 function highlightRlmTools(code: string): (string | JSX.Element)[] {
   const parts: (string | JSX.Element)[] = [];

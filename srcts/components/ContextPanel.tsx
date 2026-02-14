@@ -13,9 +13,11 @@ function extractAccessedVars(iterations: Iteration[], upTo: number): Set<string>
   const accessed = new Set<string>();
   for (let i = 0; i <= Math.min(upTo, iterations.length - 1); i++) {
     const code = iterations[i].code;
-    // Match patterns like exec_source('name', ...) or inspect_source('name', ...)
-    const matches = code.matchAll(/(?:exec_source|inspect_source)\s*\(\s*['"](\w+)['"]/g);
-    for (const m of matches) {
+    // In real DSPy RLM traces, input variables are accessed directly by name.
+    // Match bare variable references like `context`, `question`, or
+    // subscript/method access like `context[...]`, `context.find(...)`.
+    const varPatterns = code.matchAll(/\b(context|question|query|text|document)\b/g);
+    for (const m of varPatterns) {
       accessed.add(m[1]);
     }
   }
@@ -23,7 +25,7 @@ function extractAccessedVars(iterations: Iteration[], upTo: number): Set<string>
 }
 
 function countToolCalls(iterations: Iteration[], upTo: number): Record<string, number> {
-  const counts: Record<string, number> = { inspect_source: 0, exec_source: 0, llm_query: 0, SUBMIT: 0 };
+  const counts: Record<string, number> = { print: 0, llm_query: 0, llm_query_batched: 0, SUBMIT: 0 };
   for (let i = 0; i <= Math.min(upTo, iterations.length - 1); i++) {
     const code = iterations[i].code;
     for (const tool of Object.keys(counts)) {

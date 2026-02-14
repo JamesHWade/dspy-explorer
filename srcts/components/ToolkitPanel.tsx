@@ -9,37 +9,37 @@ interface ToolkitPanelProps {
 
 const actions = [
   {
-    tab: "inspect",
-    name: "inspect_source()",
-    signature: "inspect_source(name, path, start, end)",
-    oneLiner: "Read a slice of a source file",
-    example: "inspect_source('flask_source', 'flask/app.py', 100, 200)",
+    tab: "explore",
+    name: "print()",
+    signature: "print(context[start:end])",
+    oneLiner: "Explore variables by slicing and printing",
+    example: "print(context[:1000])  # Read the first 1000 chars",
     description:
-      "Returns lines 100\u2013200 of a file. Only that slice enters the prompt \u2014 the rest stays in the sandbox.",
+      "The model slices input variables and prints portions to understand their structure. Only what's printed enters the next prompt.",
     note:
-      "The full source can be millions of characters. inspect_source() pulls in only what the model asks for.",
+      "The full context can be millions of characters. The model reads it in chunks, deciding what to look at next.",
   },
   {
     tab: "search",
-    name: "exec_source()",
-    signature: "exec_source(name, 'grep', pattern=regex)",
-    oneLiner: "Search across a source collection",
-    example: "exec_source('flask_source', 'grep', pattern=r'def route')",
+    name: ".find() / slicing",
+    signature: "context[context.find('class Flask'):...]",
+    oneLiner: "Search and extract specific regions",
+    example: "idx = context.find('def route')\nprint(context[idx:idx+500])",
     description:
-      "Returns matching lines with surrounding context. The model doesn\u2019t scan the file \u2014 the sandbox does.",
+      "Python string methods locate specific patterns. The model navigates large contexts by searching, not scanning.",
     note:
-      "Useful for locating symbols, function definitions, or patterns without reading everything.",
+      "Standard Python is the toolkit. The model uses .find(), .count(), slicing, regex, and more to explore.",
   },
   {
     tab: "ask",
     name: "llm_query()",
-    signature: "llm_query(question, context)",
+    signature: "llm_query(prompt)",
     oneLiner: "Send a sub-question to another LLM call",
-    example: "llm_query('Summarize Flask\\'s routing mechanism', snippet)",
+    example: "summary = llm_query('Summarize this routing mechanism:\\n' + snippet)",
     description:
-      "Delegates a focused question to a separate LLM call with a small context slice. Useful for summarising or interpreting code excerpts.",
+      "Delegates a focused question to a separate LLM call. Useful for summarising or interpreting code excerpts that need semantic understanding.",
     note:
-      "The outer model stays on task while a cheaper inner call handles a detail question.",
+      "The outer model stays on task while a cheaper inner call handles a detail question. Use llm_query_batched() for multiple prompts.",
   },
   {
     tab: "submit",
@@ -80,18 +80,18 @@ export function ToolkitPanel({ onContinue, onBack }: ToolkitPanelProps) {
             How the RLM explores
           </h1>
           <p className="text-sm text-muted-foreground max-w-xl">
-            The LLM never sees all the source code at once. Instead, it writes
-            Python expressions in a REPL loop, using these four actions to pull in
+            The LLM never sees all the input at once. Instead, it writes
+            Python code in a REPL loop, using standard tools to pull in
             only what it needs.
           </p>
         </div>
 
         {/* 2. Tabbed action cards */}
-        <Tabs defaultValue="inspect" className="w-full">
+        <Tabs defaultValue="explore" className="w-full">
           <TabsList className="w-full grid grid-cols-4">
             {actions.map((a) => (
               <TabsTrigger key={a.tab} value={a.tab} className="text-xs sm:text-sm">
-                {a.tab === "ask" ? "Ask" : a.tab.charAt(0).toUpperCase() + a.tab.slice(1)}
+                {a.tab.charAt(0).toUpperCase() + a.tab.slice(1)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -127,7 +127,7 @@ export function ToolkitPanel({ onContinue, onBack }: ToolkitPanelProps) {
           <h2 className="text-lg font-semibold">The REPL loop</h2>
           <p className="text-sm text-muted-foreground max-w-lg">
             Each iteration follows the same cycle. Code executes in a
-            sandboxed Python interpreter &mdash; the model only sees the printed output.
+            sandboxed Python interpreter (Deno + Pyodide) &mdash; the model only sees the printed output.
           </p>
 
           <div className="flex items-center justify-center gap-0 py-4 overflow-x-auto">

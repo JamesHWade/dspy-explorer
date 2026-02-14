@@ -15,26 +15,26 @@ const LLM_QUERY_RE = /llm_query\s*\(/;
 function getConceptCallout(
   iter: Iteration,
 ): { title: string; body: string } | null {
-  const code = iter.code.toLowerCase();
+  const code = iter.code;
 
   if (iter.iteration === 1) {
     return {
       title: "Context as Environment",
-      body: "Source code sits in sandbox variables. The model only sees names and sizes - not the actual content. It must write Python code to explore.",
+      body: "Input data sits in sandbox variables. The model only sees names and sizes \u2014 not the actual content. It must write Python code to explore.",
     };
   }
 
-  if (iter.iteration <= 3 && /inspect_source\(/.test(code) && !iter.is_final) {
+  if (iter.iteration <= 3 && /print\(.*\[.*:.*\]/.test(code) && !iter.is_final) {
     return {
-      title: "Targeted Transfer",
-      body: "inspect_source() transfers a slice from the sandbox into the context window. The model reads only what it needs, not the entire file.",
+      title: "Targeted Exploration",
+      body: "The model slices and prints portions of the context. It reads only what it needs, keeping the context window small.",
     };
   }
 
-  if (/exec_source.*grep|search\(/.test(code) && iter.iteration <= 4) {
+  if (/\.find\(|\.index\(|\.count\(/.test(code) && iter.iteration <= 4) {
     return {
       title: "Pattern Search",
-      body: "Search returns matches, not entire files. The model finds needles without loading haystacks into context.",
+      body: "String methods like .find() locate specific patterns without loading everything into the LLM context.",
     };
   }
 
@@ -48,7 +48,7 @@ function getConceptCallout(
   if (!iter.success && !iter.is_final) {
     return {
       title: "Self-Correction",
-      body: "Failures are normal - the model sees the error and self-corrects. 2-4 errors per run is typical.",
+      body: "Failures are normal \u2014 the model sees the error and self-corrects. 2\u20134 errors per run is typical.",
     };
   }
 
