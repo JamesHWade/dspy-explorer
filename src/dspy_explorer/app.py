@@ -28,9 +28,9 @@ def server(input: Inputs, output: Outputs, session: Session):
     @reactive.effect
     @reactive.event(input.start_live_run)
     async def handle_live_run():
-        if input.mode() != "live":
-            return
         config = input.start_live_run()
+        if not config:
+            return
         try:
             from dspy_explorer.dspy_live import run_live_rlm
             await run_live_rlm(session, config)

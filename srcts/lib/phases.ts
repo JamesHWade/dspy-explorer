@@ -4,48 +4,82 @@ export function detectPhase(
   iter: Iteration,
   allIterations: Iteration[],
 ): Phase {
-  const code = iter.code.toLowerCase();
+  const code = iter.code;
+  const codeLower = code.toLowerCase();
   const reasoning = (iter.reasoning ?? "").toLowerCase();
   const idx = iter.iteration;
+  const totalIters = allIterations.length;
 
-  // SUBMIT or final answer construction = identify_gap
-  if (iter.is_final || /submit\s*\(/.test(code)) {
+  // SUBMIT or final answer = identify_gap
+  if (iter.is_final || /SUBMIT\s*\(/.test(code)) {
     return "identify_gap";
   }
 
-  // Early iterations that print/explore to understand structure = orient
-  if (
-    idx <= 2 &&
-    (/print\(.*\[:/.test(code) ||
-      /type\(|len\(|dir\(|\.keys\(/.test(code) ||
-      /structure|overview|explore|understand/.test(reasoning))
-  ) {
-    return "orient";
-  }
-
-  // Cross-referencing: using llm_query for semantic analysis
+  // Sub-LM queries = cross-reference
   if (/llm_query/.test(code)) {
     return "cross_reference";
   }
 
-  // Code tracing: following definitions, imports, class hierarchies
+  // Orient: early iterations scanning overall structure
   if (
-    /import|class\s|def\s|super\(\)|__init__|\.find\(.*class/.test(code) ||
-    /trace|follow|logic|chain|hierarchy/.test(reasoning)
+    idx <= 2 &&
+    (/print\(.*\[:/.test(code) ||
+      /context\s*\[\s*:\s*\d/.test(codeLower) ||
+      /type\(|len\(|dir\(|\.keys\(/.test(codeLower) ||
+      /structure|overview|explore|understand|preview|beginning|available|identify the/.test(
+        reasoning,
+      ))
   ) {
+    return "orient";
+  }
+
+  // Reasoning-based signals
+  const traceReasoning =
+    /definition|implementation|method|dispatch|lifecycle|invoke|call\s*(path|chain)|inheritance|within the \w+ class|full\s*(content|definition)|analyz(e|ing)\s*(the|specific|request|how)/.test(
+      reasoning,
+    );
+  const locateReasoning =
+    /search(ing)?(\s+for)?|find(ing)?(\s+the)?|locat(e|ing)|extract(ing)?|filter(ing)?|look(ing)?\s*(for|at)|occurrenc|mention|scan(ning)?/.test(
+      reasoning,
+    );
+  const synthesizeReasoning =
+    /compile|synthesiz|format.*final|ready.*submit|structur(e|ing)\s*(the\s+)?find|prepare.*submission|present.*final/.test(
+      reasoning,
+    );
+
+  // Near-end synthesis/compilation = approaching identify_gap
+  if (synthesizeReasoning && idx >= totalIters - 2) {
+    return "identify_gap";
+  }
+
+  // Both trace and locate signals — use position to disambiguate
+  if (traceReasoning && locateReasoning) {
+    return idx > Math.floor(totalIters * 0.4) ? "trace_code" : "locate";
+  }
+
+  // Strong trace signals
+  if (traceReasoning) {
     return "trace_code";
   }
 
-  // Locate: searching, slicing, finding specific content
-  if (
-    /\.find\(|\.index\(|\.count\(|\[.*:.*\]/.test(code) ||
-    /search|find|locate|identify|look for/.test(reasoning)
-  ) {
+  // Code-level search patterns
+  const hasRegexSearch = /re\.(findall|search|match)\s*\(/.test(codeLower);
+  const hasListCompFilter = /\[.*\bfor\b.*\bin\b.*\bif\b/.test(codeLower);
+  const hasFindIndex = /\.find\(|\.index\(|\.count\(/.test(codeLower);
+
+  // Locate: searching/filtering with code or reasoning
+  if (hasRegexSearch || hasListCompFilter || hasFindIndex || locateReasoning) {
     return "locate";
   }
 
-  // Default to orient for early iterations, locate for later
-  return idx <= 3 ? "orient" : "locate";
+  // Print with slices in early iterations = orient
+  if (/print\(/.test(codeLower) && /\[.*:.*\]/.test(code) && idx <= 3) {
+    return "orient";
+  }
+
+  // Defaults based on position
+  if (idx <= 2) return "orient";
+  return "locate";
 }
 
 export function annotatePhases(iterations: Iteration[]): Iteration[] {

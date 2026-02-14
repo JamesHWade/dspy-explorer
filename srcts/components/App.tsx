@@ -78,6 +78,7 @@ export function App() {
   // Playback controls
   const playback = usePlayback(iterations.length);
   const phaseProgress = usePhaseDetection(iterations, playback.currentIndex);
+  const annotatedIterations = phaseProgress.annotatedIterations;
 
   const handleStartExploring = useCallback(() => {
     setView("toolkit");
@@ -193,7 +194,7 @@ export function App() {
           <div className="space-y-4">
             {activeTrace ? (
               <REPLTimeline
-                iterations={iterations}
+                iterations={annotatedIterations}
                 currentIndex={playback.currentIndex}
                 question={activeTrace.question}
               />
