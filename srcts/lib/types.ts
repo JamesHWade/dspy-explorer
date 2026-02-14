@@ -23,6 +23,7 @@ export type Phase =
   | "orient"
   | "locate"
   | "trace_code"
+  | "cross_reference"
   | "identify_gap";
 
 export interface TraceData {
@@ -162,6 +163,11 @@ export const PHASE_INFO: Record<
     label: "Trace",
     color: "var(--phase-trace-code)",
     description: "Following code dependency chains and call paths",
+  },
+  cross_reference: {
+    label: "Cross-ref",
+    color: "var(--phase-cross-ref)",
+    description: "Using llm_query() to delegate sub-questions to another LLM",
   },
   identify_gap: {
     label: "Identify",

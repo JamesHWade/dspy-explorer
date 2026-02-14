@@ -52,6 +52,7 @@
     --phase-orient: oklch(0.55 0.25 265);
     --phase-locate: oklch(0.55 0.25 290);
     --phase-trace-code: oklch(0.7 0.15 200);
+    --phase-cross-ref: oklch(0.75 0.15 85);
     --phase-identify: oklch(0.6 0.2 145);
   }
 

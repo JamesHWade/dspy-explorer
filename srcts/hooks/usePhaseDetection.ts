@@ -25,6 +25,7 @@ export function usePhaseDetection(
       orient: 0,
       locate: 0,
       trace_code: 0,
+      cross_reference: 0,
       identify_gap: 0,
     };
 

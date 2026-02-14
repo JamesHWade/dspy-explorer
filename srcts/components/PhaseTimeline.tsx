@@ -12,6 +12,7 @@ const PHASES_ORDER: Phase[] = [
   "orient",
   "locate",
   "trace_code",
+  "cross_reference",
   "identify_gap",
 ];
 
