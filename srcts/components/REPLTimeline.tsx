@@ -37,14 +37,14 @@ export function REPLTimeline({
 
       {/* Timeline */}
       <div className="relative">
-        {/* Vertical timeline line */}
-        <div className="absolute left-[18px] top-0 bottom-0 w-px bg-border" />
+        {/* Vertical timeline line — hidden on mobile for space */}
+        <div className="absolute left-[18px] top-0 bottom-0 w-px bg-border hidden lg:block" />
 
-        <div className="space-y-6">
+        <div className="space-y-4 lg:space-y-6">
           {visibleIterations.map((iter, idx) => (
-            <div key={iter.iteration} className="relative pl-12">
-              {/* Timeline dot */}
-              <div className="absolute left-[12px] top-6 w-3 h-3 rounded-full border-2 border-background bg-primary z-10" />
+            <div key={iter.iteration} className="relative lg:pl-12">
+              {/* Timeline dot — hidden on mobile */}
+              <div className="absolute left-[12px] top-6 w-3 h-3 rounded-full border-2 border-background bg-primary z-10 hidden lg:block" />
               <IterationCard
                 iteration={iter}
                 isNew={idx === currentIndex}

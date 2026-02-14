@@ -10,33 +10,35 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
         {/* Hero */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-            Recursive Language Models
+            How RLMs Work
           </h1>
           <p className="text-lg text-muted-foreground max-w-lg mx-auto">
-            An RLM doesn&rsquo;t receive all the source code in its prompt.
-            It writes Python code to explore it incrementally.
+            What if an LLM could write code to explore a codebase
+            instead of reading it all at once?
           </p>
         </div>
 
         {/* Comparison */}
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="rounded-xl border bg-card p-6 space-y-3">
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Paste everything
+            <div className="text-sm font-semibold text-destructive/80 uppercase tracking-wider">
+              Traditional Approach
             </div>
-            <pre className="font-mono text-sm text-muted-foreground leading-relaxed whitespace-pre"><span className="text-foreground">lm</span>({"\n"}  <span className="text-orange-600 dark:text-orange-400">question</span> + {"\n"}  <span className="text-destructive">all_source_code</span>{"\n"})</pre>
-            <p className="text-sm text-muted-foreground mt-2">
-              The entire codebase goes into the prompt. The model gets one shot to find what matters.
+            <h3 className="text-base font-semibold">Paste everything into the prompt</h3>
+            <pre className="font-mono text-sm text-muted-foreground leading-relaxed whitespace-pre"><span className="text-foreground">lm</span>({"\n"}  <span className="text-orange-600 dark:text-orange-400">question</span> + {"\n"}  <span className="text-destructive">entire_codebase</span>  <span className="text-destructive/60"># 338K chars</span>{"\n"})</pre>
+            <p className="text-sm text-muted-foreground">
+              The full source code goes into one prompt. The model gets a single pass to find what matters.
             </p>
           </div>
 
-          <div className="rounded-xl border bg-card p-6 space-y-3">
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Explore incrementally
+          <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-6 space-y-3">
+            <div className="text-sm font-semibold text-primary uppercase tracking-wider">
+              Recursive Language Model
             </div>
+            <h3 className="text-base font-semibold">Write code to explore incrementally</h3>
             <pre className="font-mono text-sm leading-relaxed whitespace-pre"><span className="text-foreground">dspy</span>.<span className="text-foreground">RLM</span>({"\n"}  <span className="text-muted-foreground">"question -&gt; answer"</span>,{"\n"}  question=question,{"\n"}  <span className="text-primary font-semibold">max_iterations</span>=15{"\n"})</pre>
-            <p className="text-sm text-muted-foreground mt-2">
-              Source code lives in the sandbox. The model writes Python to explore what it needs.
+            <p className="text-sm text-muted-foreground">
+              Source code lives in a sandbox. The model writes Python to search, slice, and analyze only what it needs.
             </p>
           </div>
         </div>
@@ -44,11 +46,11 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
         {/* Key insight */}
         <div className="rounded-xl bg-muted/50 p-6 text-center space-y-2">
           <p className="text-sm font-medium">
-            Megabytes of source code sit in the sandbox environment.
+            338K characters of Flask source code &mdash; but only 2&ndash;5% enters the context window.
           </p>
           <p className="text-sm text-muted-foreground">
-            The LLM only sees variable names and sizes. It writes code to transfer exactly what
-            it needs into the context window.
+            The LLM writes Python to explore the codebase, transferring
+            just the fragments it needs to reason about.
           </p>
         </div>
 
@@ -69,7 +71,7 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
             </button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Traces show a real DSPy RLM exploring Flask&rsquo;s source code
+            Watch a real DSPy RLM explore Flask&rsquo;s source code step by step
           </p>
         </div>
       </div>
