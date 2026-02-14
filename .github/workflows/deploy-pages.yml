@@ -34,9 +34,11 @@ jobs:
 
       - run: pip install shinylive
 
-      # Assemble shinylive app
+      # Assemble shinylive app — copy built React bundle + source-of-truth
+      # Python files into shinylive-app/ before export
       - name: Assemble Shinylive app
         run: |
+          rm -rf shinylive-app/www shinylive-app/data
           cp -r www/ shinylive-app/www/
           cp -r src/dspy_explorer/data/ shinylive-app/data/
           cp src/dspy_explorer/shinyreact.py shinylive-app/shinyreact.py
