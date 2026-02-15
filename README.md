@@ -15,12 +15,10 @@ The GitHub Pages version runs entirely in the browser via [Shinylive](https://sh
 ### Run Locally
 
 ```bash
-# Install and run (replay mode — no DSPy needed)
-uv pip install .
-dspy-explorer
-
-# Or run directly without installing
-uvx dspy-explorer
+# Clone and run (replay mode — no DSPy needed)
+git clone https://github.com/JamesHWade/dspy-explorer.git
+cd dspy-explorer
+uv run dspy-explorer
 ```
 
 ### Live Mode (with DSPy)

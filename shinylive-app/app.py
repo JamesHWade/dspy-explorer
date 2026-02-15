@@ -27,7 +27,7 @@ def server(input: Inputs, output: Outputs, session: Session):
             "status": "error",
             "message": (
                 "Live mode is not available in the browser. "
-                "Run locally with: uvx dspy-explorer"
+                "Run locally with: git clone https://github.com/JamesHWade/dspy-explorer.git && cd dspy-explorer && uv run dspy-explorer"
             ),
         })
 
