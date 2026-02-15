@@ -73,6 +73,28 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
             for a tighter loop that&rsquo;s easier to reason about and optimize with
             DSPy&rsquo;s compiler.
           </p>
+          <p>
+            As DSPy creator{" "}
+            <a
+              href="https://x.com/lateinteraction"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground underline underline-offset-2 hover:text-primary transition-colors"
+            >
+              Omar Khattab
+            </a>{" "}
+            puts it: the key distinction is <em className="text-foreground">symbolic recursion</em>.
+            A typical agent (including CodeAct-style agents with LLM tools) verbalizes
+            its inputs as tokens and generates sub-calls one at a time, autoregressively.
+            An RLM externalizes long inputs as <em>variables</em>, then writes code
+            that can launch sub-LLM calls in bulk (e.g.,{" "}
+            <code className="text-xs font-mono bg-muted rounded px-1 py-0.5 text-foreground">
+              [llm_query(...) for chunk in chunks]
+            </code>).
+            The root model never copies the full input token-by-token. It map-reduces
+            over its own prompt through code, making the number of sub-calls scale
+            linearly with context size rather than hitting attention&rsquo;s quadratic wall.
+          </p>
         </div>
 
         {/* CTA */}
