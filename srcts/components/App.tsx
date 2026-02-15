@@ -164,18 +164,16 @@ export function App() {
 
         {/* Orientation banner */}
         {orientationVisible && (
-          <div className="mb-4 rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/30 px-4 py-3 flex items-start gap-3">
-            <div className="flex-1 text-sm text-blue-700 dark:text-blue-400">
-              <span className="font-semibold">Watch the LLM think in code.</span>{" "}
-              <span className="text-blue-600 dark:text-blue-500">
-                Each card below is one REPL iteration &mdash; the model writes Python code,
-                executes it in a sandbox, reads the output, and decides what to do next. The sidebar
-                tracks how little source data actually enters the context window.
-              </span>
+          <div className="mb-4 rounded-lg border border-dashed border-muted-foreground/25 px-4 py-3 flex items-start gap-3">
+            <div className="flex-1 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">Watch the LLM think in code.</span>{" "}
+              Each card below is one REPL iteration: the model writes Python code,
+              executes it in a sandbox, reads the output, and decides what to do next. The sidebar
+              tracks how little source data actually enters the context window.
             </div>
             <button
               onClick={() => setShowOrientation(false)}
-              className="shrink-0 p-1 rounded hover:bg-blue-200/50 dark:hover:bg-blue-800/30 text-blue-400 hover:text-blue-600 transition-colors"
+              className="shrink-0 p-1 rounded hover:bg-muted text-muted-foreground/50 hover:text-foreground transition-colors"
               aria-label="Dismiss"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
