@@ -46,7 +46,7 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
         {/* Key insight */}
         <div className="rounded-xl bg-muted/50 p-6 text-center space-y-2">
           <p className="text-sm font-medium">
-            338K characters of Flask source code &mdash; but only 2&ndash;5% enters the context window.
+            338K characters of Flask source code, but only 2-5% enters the context window.
           </p>
           <p className="text-sm text-muted-foreground">
             The LLM writes Python to explore the codebase, transferring
@@ -61,7 +61,7 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
           </p>
           <p>
             Sort of. The difference is constraint. An agent picks from a menu of
-            tools &mdash; web search, file read, API call &mdash; and the orchestration
+            tools (web search, file read, API call) and the orchestration
             logic is where things get fragile. An RLM has exactly one tool: a Python
             interpreter. The model decides what to do by writing code, not by
             choosing from a fixed set of actions. There&rsquo;s no routing layer,
@@ -69,7 +69,7 @@ export function IntroPanel({ onLearnToolkit, onJumpToTraces }: IntroPanelProps) 
             sandbox is deterministic: same code in, same output out.
           </p>
           <p>
-            The tradeoff is obvious &mdash; you give up the breadth of arbitrary tools
+            The tradeoff: you give up the breadth of arbitrary tools
             for a tighter loop that&rsquo;s easier to reason about and optimize with
             DSPy&rsquo;s compiler.
           </p>

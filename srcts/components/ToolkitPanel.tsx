@@ -1,3 +1,4 @@
+import { Eye, Search, MessageCircle, CheckCircle2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { CodeBlock } from "./CodeBlock";
@@ -11,6 +12,7 @@ const actions = [
   {
     tab: "explore",
     name: "print()",
+    icon: Eye,
     signature: "print(context[start:end])",
     oneLiner: "Explore variables by slicing and printing",
     example: "print(context[:1000])  # Read the first 1000 chars",
@@ -22,6 +24,7 @@ const actions = [
   {
     tab: "search",
     name: ".find() / slicing",
+    icon: Search,
     signature: "context[context.find('class Flask'):...]",
     oneLiner: "Search and extract specific regions",
     example: "idx = context.find('def route')\nprint(context[idx:idx+500])",
@@ -33,6 +36,7 @@ const actions = [
   {
     tab: "ask",
     name: "llm_query()",
+    icon: MessageCircle,
     signature: "llm_query(prompt)",
     oneLiner: "Send a sub-question to another LLM call",
     example: "summary = llm_query('Summarize this routing mechanism:\\n' + snippet)",
@@ -44,6 +48,7 @@ const actions = [
   {
     tab: "submit",
     name: "SUBMIT()",
+    icon: CheckCircle2,
     signature: "SUBMIT(answer=...)",
     oneLiner: "Return the final answer and stop",
     example: "SUBMIT(answer='Flask decorators work by...')",
@@ -63,7 +68,7 @@ const loopSteps = [
 
 export function ToolkitPanel({ onContinue, onBack }: ToolkitPanelProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-12">
         {/* 1. Header */}
         <div className="space-y-3">
@@ -89,37 +94,47 @@ export function ToolkitPanel({ onContinue, onBack }: ToolkitPanelProps) {
         {/* 2. Tabbed action cards */}
         <Tabs defaultValue="explore" className="w-full">
           <TabsList className="w-full grid grid-cols-4">
-            {actions.map((a) => (
-              <TabsTrigger key={a.tab} value={a.tab} className="text-xs sm:text-sm">
-                {a.tab.charAt(0).toUpperCase() + a.tab.slice(1)}
-              </TabsTrigger>
-            ))}
+            {actions.map((a) => {
+              const Icon = a.icon;
+              return (
+                <TabsTrigger key={a.tab} value={a.tab} className="text-xs sm:text-sm gap-1.5">
+                  <Icon className="w-3.5 h-3.5 hidden sm:block" />
+                  {a.tab.charAt(0).toUpperCase() + a.tab.slice(1)}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
 
-          {actions.map((a) => (
-            <TabsContent key={a.tab} value={a.tab}>
-              <div className="rounded-xl border bg-card p-6 space-y-4 mt-2">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    {a.name}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    {a.oneLiner}
-                  </span>
+          {actions.map((a) => {
+            const Icon = a.icon;
+            return (
+              <TabsContent key={a.tab} value={a.tab}>
+                <div className="rounded-xl border bg-card p-6 space-y-4 mt-2">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <Icon className="w-4 h-4 text-primary" />
+                      <Badge variant="secondary" className="font-mono text-xs">
+                        {a.name}
+                      </Badge>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {a.oneLiner}
+                    </span>
+                  </div>
+
+                  <div className="font-mono text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">
+                    {a.signature}
+                  </div>
+
+                  <p className="text-sm">{a.description}</p>
+
+                  <CodeBlock code={a.example} className="text-xs" />
+
+                  <p className="text-xs text-muted-foreground">{a.note}</p>
                 </div>
-
-                <div className="font-mono text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">
-                  {a.signature}
-                </div>
-
-                <p className="text-sm">{a.description}</p>
-
-                <CodeBlock code={a.example} className="text-xs" />
-
-                <p className="text-xs text-muted-foreground">{a.note}</p>
-              </div>
-            </TabsContent>
-          ))}
+              </TabsContent>
+            );
+          })}
         </Tabs>
 
         {/* 3. The loop */}
@@ -127,7 +142,7 @@ export function ToolkitPanel({ onContinue, onBack }: ToolkitPanelProps) {
           <h2 className="text-lg font-semibold">The REPL loop</h2>
           <p className="text-sm text-muted-foreground max-w-lg">
             Each iteration follows the same cycle. Code executes in a
-            sandboxed Python interpreter (Deno + Pyodide) &mdash; the model only sees the printed output.
+            sandboxed Python interpreter (Deno + Pyodide). The model only sees the printed output.
           </p>
 
           <div className="flex items-center justify-center gap-0 py-4 overflow-x-auto">
@@ -162,14 +177,22 @@ export function ToolkitPanel({ onContinue, onBack }: ToolkitPanelProps) {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* 4. Continue */}
-        <div className="pt-4">
+      {/* Sticky bottom CTA */}
+      <div className="fixed bottom-0 inset-x-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 z-30">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground hidden sm:block">
+            See these tools in action on real Flask source code
+          </span>
           <button
             onClick={onContinue}
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors w-full sm:w-auto"
           >
             Continue to traces
+            <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
           </button>
         </div>
       </div>
