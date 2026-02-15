@@ -82,21 +82,24 @@ export function App() {
 
   const handleStartExploring = useCallback(() => {
     setView("toolkit");
+    window.scrollTo(0, 0);
     playback.pause();
   }, [playback]);
 
   const handleStartTraces = useCallback(() => {
     setView("traces");
-    playback.play();
-  }, [playback]);
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleShowToolkit = useCallback(() => {
     setView("toolkit");
+    window.scrollTo(0, 0);
     playback.pause();
   }, [playback]);
 
   const handleNavigateHome = useCallback(() => {
     setView("intro");
+    window.scrollTo(0, 0);
     playback.pause();
   }, [playback]);
 
