@@ -106,13 +106,13 @@ export function TokenBudget({
 
         {/* Context window insight */}
         {totalContextChars > 0 && (
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 p-3 space-y-1">
-            <div className="text-xs font-medium text-blue-700 dark:text-blue-400">
+          <div className="rounded-lg border border-dashed border-muted-foreground/25 p-3 space-y-1">
+            <div className="text-xs font-medium text-muted-foreground">
               Why this matters
             </div>
-            <p className="text-xs text-blue-600 dark:text-blue-500 leading-relaxed">
+            <p className="text-xs text-muted-foreground/80 leading-relaxed">
               {formatChars(totalContextChars)} of data sits in the sandbox environment as variables.
-              The LLM writes Python code to inspect and extract what it needs — only
+              The LLM writes Python code to inspect and extract what it needs. Only
               those small fragments enter the prompt, leaving room for reasoning.
             </p>
           </div>

@@ -59,11 +59,11 @@ export function REPLTimeline({
       {/* "Done" marker */}
       {currentIndex >= iterations.length - 1 && iterations.length > 0 && (
         <div className="text-center py-4">
-          <span className="inline-flex items-center gap-2 rounded-full bg-green-100 dark:bg-green-900/30 px-4 py-2 text-sm font-medium text-green-800 dark:text-green-400">
+          <span className="inline-flex items-center gap-2 rounded-full border border-green-300 dark:border-green-800 bg-green-50 dark:bg-green-950/40 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-400">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-            Run complete - {iterations.length} iterations
+            Run complete &middot; {iterations.length} iterations
           </span>
         </div>
       )}
